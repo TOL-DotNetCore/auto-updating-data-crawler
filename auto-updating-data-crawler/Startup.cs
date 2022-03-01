@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
+using auto_updating_data_crawler.Services;
 
 namespace auto_updating_data_crawler
 {
@@ -29,6 +30,11 @@ namespace auto_updating_data_crawler
             services.AddHangfire(x => x.UseSqlServerStorage(@"Data Source=.;Initial Catalog=hangfire-webapi-db;Integrated Security=True;Pooling=False"));
             services.AddHangfireServer();
             services.AddControllers();
+
+            services.AddScoped<ICrawlerService, CrawlerService>();
+            services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
