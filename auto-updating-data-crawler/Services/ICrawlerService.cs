@@ -11,5 +11,6 @@ namespace auto_updating_data_crawler.Services
         Task<string> GetHtmlOfPage(string url);
         Task<List<Weather>> GetWeathers();
         Task<byte[]> ExportToExcel(List<Weather> LstWeather);
+        Task CrawlAndUploadToS3();
     }
 }

@@ -32,6 +32,8 @@ namespace auto_updating_data_crawler
             services.AddControllers();
 
             services.AddScoped<ICrawlerService, CrawlerService>();
+            services.AddScoped<IS3Service, S3Service>();
+
             services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
