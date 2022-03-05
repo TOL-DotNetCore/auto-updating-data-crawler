@@ -50,8 +50,8 @@ namespace auto_updating_data_crawler.Controllers
 
             return Ok("Confirmation job created!");
         }
-
-
+        
+        // function
         public void SendWelcomeEmail(string text)
         {
             Console.WriteLine(text);

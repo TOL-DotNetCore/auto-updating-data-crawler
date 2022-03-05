@@ -1,6 +1,7 @@
 ﻿using auto_updating_data_crawler.Models;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,6 +15,21 @@ namespace auto_updating_data_crawler.Services
 {
     public class CrawlerService : ICrawlerService
     {
+        private readonly IS3Service _s3Service;
+        public CrawlerService(IS3Service s3Service)
+        {
+            _s3Service = s3Service;
+        }
+        public async Task CrawlAndUploadToS3()
+        {
+            var lstWeather = await this.GetWeathers();
+            var file = await ExportToExcel(lstWeather);
+            var stream = new MemoryStream(file);
+
+            var fileIFormFile = new FormFile(stream, 0, file.Length, "LstWeather", "LstWeather");
+            await _s3Service.UploadFileS3(fileIFormFile);
+        }
+
         public async Task<byte[]> ExportToExcel(List<Weather> LstWeather)
         {
             using (var workbook = new XLWorkbook())
@@ -35,8 +51,8 @@ namespace auto_updating_data_crawler.Services
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
                     return content;
+
                 }
             }
         }
