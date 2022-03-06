@@ -18,7 +18,7 @@ namespace auto_updating_data_crawler.Services
         private readonly IAmazonS3 _awsS3Client;
         public S3Service()
         {
-            _awsS3Client = new AmazonS3Client(AwsAccessKey, AwsSecretAccessKey, Amazon.RegionEndpoint.APSouth1);
+            _awsS3Client = new AmazonS3Client(AwsAccessKey, AwsSecretAccessKey, Amazon.RegionEndpoint.APSoutheast1);
         }
         public async Task<bool> DeleteFileS3(string fileName)
         {
@@ -58,24 +58,22 @@ namespace auto_updating_data_crawler.Services
                 throw;
             }
         }
-
-        public async Task UploadFileS3(IFormFile file)
+        public async Task UploadFileS3(byte[] blob)
         {
-                using (var newMemoryStream = new MemoryStream())
-                {
-                    file.CopyTo(newMemoryStream);
-                    var upLoadRequest = new TransferUtilityUploadRequest
-                    {
-                        InputStream = newMemoryStream,
-                        Key = file.FileName,
-                        BucketName = _bucketName,
-                        CannedACL = S3CannedACL.BucketOwnerFullControl
-                    };
+            var ms = new System.IO.MemoryStream();
+            ms.Write(blob, 0, blob.Length);
+            ms.Position = 0;
+            var now = DateTime.Now.ToString().Replace("/", "-");
+            var upLoadRequest = new TransferUtilityUploadRequest
+            {
+                InputStream = ms,
+                Key = "weather_" + now + ".xlsx",
+                BucketName = _bucketName,
+                CannedACL = S3CannedACL.BucketOwnerFullControl
+            };
 
-                    var fileTransferUtility = new TransferUtility(_awsS3Client);
-                    await fileTransferUtility.UploadAsync(upLoadRequest);
-                }
-            
+            var fileTransferUtility = new TransferUtility(_awsS3Client);
+            await fileTransferUtility.UploadAsync(upLoadRequest);   
         }
     }
 }
