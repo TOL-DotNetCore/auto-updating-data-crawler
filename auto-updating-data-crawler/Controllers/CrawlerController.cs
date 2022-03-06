@@ -21,22 +21,19 @@ namespace auto_updating_data_crawler.Controllers
 
 
         [HttpGet()]
-        public async Task<IActionResult> GetWeather()
+        [Route("[action]")]
+        public async Task<IActionResult> PushWeather()
         {
-            var result = await _crawlerService.GetWeathers();
-            return Ok(result);
+            await _crawlerService.CrawlAndUploadToS3();
+            return Ok();
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public IActionResult Confirm()
+        [HttpGet()]
+        public IActionResult Crawl()
         {
-            int timeInSeconds = 30;
-            var parentJobId = BackgroundJob.Schedule(() => Console.WriteLine("You asked to be unsubscribed!"), TimeSpan.FromSeconds(timeInSeconds));
-
-            BackgroundJob.ContinueJobWith(parentJobId, () => Console.WriteLine("You were unsubscribed!"));
-
-            return Ok("Confirmation job created!");
+            RecurringJob.AddOrUpdate(() =>_crawlerService.CrawlAndUploadToS3(), Cron.Minutely);
+            //Cron 30 minutes "*/30 * * * *"
+            return Ok("Succesfully");
         }
     }
 }

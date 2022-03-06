@@ -23,11 +23,9 @@ namespace auto_updating_data_crawler.Services
         public async Task CrawlAndUploadToS3()
         {
             var lstWeather = await this.GetWeathers();
-            var file = await ExportToExcel(lstWeather);
-            var stream = new MemoryStream(file);
+            var fileArrByte = await ExportToExcel(lstWeather);
 
-            var fileIFormFile = new FormFile(stream, 0, file.Length, "LstWeather", "LstWeather");
-            await _s3Service.UploadFileS3(fileIFormFile);
+            await _s3Service.UploadFileS3(fileArrByte);
         }
 
         public async Task<byte[]> ExportToExcel(List<Weather> LstWeather)
@@ -51,8 +49,8 @@ namespace auto_updating_data_crawler.Services
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-                    return content;
 
+                    return content;
                 }
             }
         }
@@ -82,7 +80,7 @@ namespace auto_updating_data_crawler.Services
 
 
                 Weather wea = new Weather {
-                    Date = DateTime.Parse(date),
+                    Date = date.Trim().Replace("/", "-"),
                     LargeTemp = largeTemp,
                     SmallTemp = smallTemp,
                     TextTemp = textTemp

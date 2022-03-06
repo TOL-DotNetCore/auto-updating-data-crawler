@@ -7,7 +7,7 @@ namespace auto_updating_data_crawler.Models
 {
     public class Weather
     {
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         public string LargeTemp { get; set; }
         public string SmallTemp { get; set; }
         public string TextTemp { get; set; }
